@@ -354,4 +354,53 @@ describe('Webpack replace loader ...', () => {
       }
     )
   })
+
+  it('should replace only one occurrence', done => {
+    webpack(getTestWebPackConfig(
+      {
+        test: /\.js$/,
+        loader: '__this-loader',
+        options: {
+          search: 'abcd',
+          replace: 'efhg'
+        }
+      }),
+      (error, stats) => {
+        expect(error).to.equal(null)
+
+        fs.readFile(outputFilePath, 'utf8', (error, contents) => {
+          expect(error).to.equal(null)
+          expect(contents).to.be.a('string')
+          expect(contents.match(/abcd/g)).to.have.lengthOf(1);
+          expect(contents.match(/efhg/g)).to.have.lengthOf(1);
+          done()
+        })
+      }
+    )
+  })
+
+  it('should replace all occurrences', done => {
+    webpack(getTestWebPackConfig(
+      {
+        test: /\.js$/,
+        loader: '__this-loader',
+        options: {
+          search: 'abcd',
+          replace: 'efgh',
+          replaceAll: true
+        }
+      }),
+      (error, stats) => {
+        expect(error).to.equal(null)
+
+        fs.readFile(outputFilePath, 'utf8', (error, contents) => {
+          expect(error).to.equal(null)
+          expect(contents).to.be.a('string')
+          expect(contents).not.to.include('abcd')
+          expect(contents.match(/efgh/g)).to.have.lengthOf(2);
+          done()
+        })
+      }
+    )
+  })
 })
